@@ -1,0 +1,52 @@
+# Unity项目.gitignore
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Uu]serSettings/
+[Vv]s/
+[Ww]ebPlayerTemplates/
+
+# 项目设置
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+
+# Unity3D生成的meta文件
+*.meta
+
+# VS Code
+.vscode/
+
+# Visual Studio
+.vs/
+
+# OS生成文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 包管理器
+[Pp]ackages/
+
+# 自动生成的Visual Studio相关文件
+MerryYellow.CodeAssist.Editor.csproj
+Test02.sln
+*.csproj
