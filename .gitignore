@@ -1,16 +1,20 @@
-# Unity项目.gitignore
+# ============= #
+# Unity 生成的 #
+# ============= #
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
 [Bb]uild/
 [Bb]uilds/
 [Ll]ogs/
-[Uu]ser[Ss]ettings/
+[Uu]user[Ss]ettings/
 [Uu]serSettings/
-[Vv]s/
-[Ww]ebPlayerTemplates/
 
-# 项目设置
+# ===================================== #
+# Visual Studio / MonoDevelop 生成的 #
+# ===================================== #
+[Ee]xported[Oo]bj/
+.vs/
 *.csproj
 *.unityproj
 *.sln
@@ -24,17 +28,11 @@
 *.pdb
 *.opendb
 *.VC.db
+*.sqlite
 
-# Unity3D生成的meta文件
-*.meta
-
-# VS Code
-.vscode/
-
-# Visual Studio
-.vs/
-
-# OS生成文件
+# ============ #
+# OS 生成的 #
+# ============ #
 .DS_Store
 .DS_Store?
 ._*
@@ -43,10 +41,19 @@
 ehthumbs.db
 Thumbs.db
 
-# 包管理器
-[Pp]ackages/
-
-# 自动生成的Visual Studio相关文件
+# ============ #
+# 项目特定的 #
+# ============ #
+# 你的一些特定文件
 MerryYellow.CodeAssist.Editor.csproj
 Test02.sln
-*.csproj
+
+# ============ #
+# 包管理器 #
+# ============ #
+# 通常不需要提交Packages文件夹，只需要manifest.json
+[Pp]ackages/
+!Packages/manifest.json
+
+# Unity Package Manager缓存
+Library/PackageCache/*
