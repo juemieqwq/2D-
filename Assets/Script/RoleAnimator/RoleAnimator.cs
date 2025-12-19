@@ -1,95 +1,138 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using static BehaviorContainer;
 
 public class RoleAnimator : MonoBehaviour
 {
     [Header("一秒播放多少帧，应用与本角色的所有动画播放")]
-    public int PlayFrame;
-    public List<GameObject> Containers;
+    public int playFrame;
+    public List<GameObject> containers = new List<GameObject>();
     public Dictionary<string, List<GameObject>> DicPlayImagesGameObjects;
-    public List<GameObject> CurrentPlayBehavior;
-    private bool IsFinshedPlay = false;
+    public List<GameObject> currentPlayBehavior;
+    private bool isInit = false;
+    private Coroutine currentCoroutine;
+    private bool isFinshedPlay = false;
     public void Init()
     {
-        foreach (var Contanier in Containers)
+        DicPlayImagesGameObjects = new Dictionary<string, List<GameObject>>();
+        if (containers == null || containers.Count == 0)
         {
-            var children = Contanier.GetComponentsInChildren<Transform>(true);
-            List<GameObject> PlayImagesGameObjects = new List<GameObject>();
-            DicPlayImagesGameObjects = new Dictionary<string, List<GameObject>>();
-            foreach (var child in children)
-            {
-                if (child == children[0])
-                    continue;
-                child.gameObject.SetActive(false);
-                PlayImagesGameObjects.Add(child.gameObject);
-                //Debug.LogError("对象" + child.gameObject + "加入队列");
-            }
-            Contanier.SetActive(true);
-            if (!DicPlayImagesGameObjects.ContainsKey(Contanier.name))
-            {
-                DicPlayImagesGameObjects.Add(Contanier.name, PlayImagesGameObjects);
-            }
+            isInit = false;
+            Debug.LogError("容器存储列表为赋值,初始化失败");
+            return;
         }
+        foreach (var Contanier in containers)
+        {
+            var ContanierClass = Contanier.GetComponent<BehaviorContainer>();
+            List<GameObject> PlayImagesGameObjects = new List<GameObject>();
+            PlayImagesGameObjects = ContanierClass.GetPlayGameObjects();
+            Contanier.gameObject.SetActive(true);
+            var KeyName = ContanierClass.roleBehaviorName.ToString();
+            if (!DicPlayImagesGameObjects.ContainsKey(KeyName))
+            {
+                DicPlayImagesGameObjects.Add(KeyName, PlayImagesGameObjects);
+                Debug.Log(PlayImagesGameObjects + "已存入");
+            }
+            else
+                Debug.Log("字典已存在Key：" + KeyName);
+        }
+        isInit = true;
     }
 
     public void Start()
     {
-        if (Containers != null)
+        if (containers != null)
         {
             Init();
-            CurrentPlayBehavior = DicPlayImagesGameObjects.GetValueOrDefault("Idle");
+            PlayRoleBehavior(RoleBehavior.Idle, true);
+            Debug.Log("初始化状态为：" + currentPlayBehavior);
         }
         else
             Debug.Log("获取的容器为空");
     }
 
-    public void PlayRoleBehavior(bool isLoop = true)
+    public void PlayRoleBehavior(RoleBehavior BehaviorName, bool isLoop = true)
     {
-        StopCoroutine("Play");
-        StartCoroutine(Play(isLoop));
+        //如果未成功初始化，在播放时再次尝试初始化
+        if (!isInit)
+            Init();
+
+        isFinshedPlay = true;
+        if (currentCoroutine != null)
+            StopCoroutine(currentCoroutine);
+        SetCurrentBehaviorAtive();
+        string Key = BehaviorName.ToString();
+        if (DicPlayImagesGameObjects.TryGetValue(Key, out currentPlayBehavior))
+        {
+            isFinshedPlay = false;
+            currentCoroutine = StartCoroutine(Play(isLoop));
+        }
+        else
+        {
+            Debug.Log("CurrentPlayBehavior:" + currentPlayBehavior);
+        }
+
+
     }
 
     private IEnumerator Play(bool isLoop = true)
     {
         float time = 0;
-        float EveryFrame = 1f / (float)this.PlayFrame;
+        float everyFrame = 0;
+        everyFrame = 1f / (float)this.playFrame;
         int Index = 0;
-        Debug.Log("开始播放");
-        while (!IsFinshedPlay)
+        // 先激活第一帧
+        if (currentPlayBehavior != null && currentPlayBehavior.Count > 0)
         {
-            time += Time.deltaTime;
-            if (time >= EveryFrame)
+            SetCurrentBehaviorAtive();
+            currentPlayBehavior[0].SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("CurrentPlayBehavior is null or empty!");
+            yield break;
+        }
+        while (!isFinshedPlay)
+        {
+            time += Time.fixedDeltaTime;
+            while (time >= everyFrame && !isFinshedPlay)
             {
+                time -= everyFrame;
                 Index++;
-                if (Index < CurrentPlayBehavior.Count)
+                // 检查是否到达最后一帧
+                if (Index >= currentPlayBehavior.Count)
                 {
-
-                    var FrameGameObject = CurrentPlayBehavior[Index];
-                    SetCurrentBehaviorAtive();
-                    FrameGameObject.SetActive(true);
-                    time = 0;
+                    if (isLoop)
+                    {
+                        Index = 0; // 循环回到第一帧
+                    }
+                    else
+                    {
+                        // 非循环播放，停留在最后一帧
+                        Index = currentPlayBehavior.Count - 1;
+                        isFinshedPlay = true;
+                        yield break;
+                    }
                 }
-                else if (isLoop)
+                if (!isFinshedPlay)
                 {
-                    SetCurrentBehaviorAtive();
-                    CurrentPlayBehavior[0].SetActive(true);
-                    Index = 0;
-                    time = 0;
-                }
-                else if (!isLoop)
-                {
-                    IsFinshedPlay = true;
+                    for (int i = 0; i < currentPlayBehavior.Count; i++)
+                    {
+                        currentPlayBehavior[i].SetActive(i == Index);
+                    }
                 }
 
             }
-            yield return null;
+            yield return new WaitForFixedUpdate();
         }
     }
 
     public void SetCurrentBehaviorAtive(bool isAtive = false)
     {
-        foreach (var frame in CurrentPlayBehavior)
+        foreach (var frame in currentPlayBehavior)
         {
             frame.SetActive(isAtive);
         }
@@ -99,13 +142,18 @@ public class RoleAnimator : MonoBehaviour
     {
         if (Input.GetKeyDown("p"))
         {
-            IsFinshedPlay = false;
-            PlayRoleBehavior(true);
+
+            PlayRoleBehavior(RoleBehavior.Idle, true);
         }
-        if (Input.GetKeyDown("o"))
+        else if (Input.GetKeyDown("o"))
         {
-            IsFinshedPlay = true;
-            StopCoroutine("Play");
+
+            PlayRoleBehavior(RoleBehavior.Run, true);
+        }
+        if (Input.GetKeyDown("s"))
+        {
+            isFinshedPlay = true;
+            StopCoroutine(currentCoroutine);
         }
     }
 }

@@ -23,11 +23,11 @@ public class SpritesTable : ScriptableObject
             }
             foreach (var sprites in AllSprites.behaviorList)
             {
-                string SpecialName = string.Concat(AllSprites.RoleName, sprites.RoleBehavior, sprites.BehaviorNumType);
-                if (!GetBehaviorBySpecialNameString.ContainsKey(SpecialName))
-                {
-                    GetBehaviorBySpecialNameString.Add(SpecialName, sprites.RoleBehaviorSprites);
-                }
+                //string SpecialName = string.Concat(AllSprites.RoleName, sprites.RoleBehavior, sprites.BehaviorNumType);
+                //if (!GetBehaviorBySpecialNameString.ContainsKey(SpecialName))
+                //{
+                //    GetBehaviorBySpecialNameString.Add(SpecialName, sprites.RoleBehaviorSprites);
+                //}
             }
         }
     }
@@ -42,20 +42,20 @@ public enum RoleName
 }
 
 
-public enum RoleBehavior
-{
-    Idle,
-    Walk,
-    Run,
-    Attack,
-    Jump,
-    Fall,
-    Hit,
-    Dead,
-    Aim,
-    Fire
+//public enum RoleBehavior
+//{
+//    Idle,
+//    Walk,
+//    Run,
+//    Attack,
+//    Jump,
+//    Fall,
+//    Hit,
+//    Dead,
+//    Aim,
+//    Fire
+//}
 
-}
 
 
 
@@ -71,7 +71,7 @@ public class Sprites
 [System.Serializable]
 public class RoleBehaviorListClass
 {
-    public RoleBehavior RoleBehavior;
+    //public RoleBehavior RoleBehavior;
     [Header("用于区分相同行为的不同动画")]
     public int BehaviorNumType;
     public Sprite[] RoleBehaviorSprites;
