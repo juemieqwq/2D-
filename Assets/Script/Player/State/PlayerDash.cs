@@ -15,7 +15,7 @@ public class PlayerDash : StateBase
     public override void Enter()
     {
         velocityY = -2;
-        DashDir = _player._inputX;
+        DashDir = _player.inputX;
         cTime = 0.2f;
         _player._CurrentState = this;
         Change_Info("Dash");

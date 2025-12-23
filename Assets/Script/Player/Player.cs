@@ -16,7 +16,7 @@ public class Player : BaseCharacter
 
 
     #region 新的动画播放器
-    private StateMachineBehaviour stateMachine;
+    private RoleStateMachine stateMachine;
     private RoleBaseState currentState;
     private RoleAnimator roleAnimator;
     #endregion
@@ -36,13 +36,13 @@ public class Player : BaseCharacter
 
     #region 输入的相关变量
     //X轴输入信息
-    public float _inputX { get; private set; }
+    public float inputX { get; private set; }
     //Y轴输入信息
-    public float _inputY { get; private set; }
+    public float inputY { get; private set; }
 
 
     //是否检测输入
-    private bool _isInput = true;
+    private bool isInput = true;
     #endregion
 
     //角色状态对角色进行一次反转
@@ -107,9 +107,13 @@ public class Player : BaseCharacter
         if (_playerManager == null)
             _playerManager = PlayerManager.instance;
         //状态机的初始化
-        _statemachine = new StateMachine(this, _CurrentState, -1, _playerManager);
-        _statemachine.ChangeState<PlayerAir>((int)PlayerState.Air);
-        _CurrentState.Init(_statemachine, this, _playerManager);
+        //_statemachine = new StateMachine(this, _CurrentState, -1, _playerManager);
+        //_statemachine.ChangeState<PlayerAir>((int)PlayerState.Air);
+        //_CurrentState.Init(_statemachine, this, _playerManager);
+        roleAnimator = GetComponentInChildren<RoleAnimator>();
+        //要自己new成初始状态，不然StateMachine内的当前为：RoleBaseState类
+        currentState = new PlayerIdleBehavior();
+        stateMachine = new RoleStateMachine(this, roleAnimator, currentState, RoleAnimator.BehaviorNameAndNumToString(BehaviorContainer.RoleBehavior.Idle));
         _WhatIsGround = LayerMask.GetMask("Ground");
         _WhatIsWall = LayerMask.GetMask("Wall");
         //gameObject是实例（当前对象）
@@ -126,18 +130,25 @@ public class Player : BaseCharacter
     {
         if (_isDead) return;
         CheckCollsion();
-        if (_isInput)
+        if (isInput)
             InputCheck();
-        _CurrentState.Update();
+        //_CurrentState.Update();
+
+        stateMachine.Update();
         ControlFilp();
         //Debug.Log("isOnGround:" + isOnGround);
         //Debug.Log("CoolTime:" + _coolTime);
         this.velocity = rigidbody.velocity;
-        anim.SetFloat("VelocityY", velocity.y);
-        anim.SetFloat("VelocityX", velocity.x);
+        //anim.SetFloat("VelocityY", velocity.y);
+        //anim.SetFloat("VelocityX", velocity.x);
         // Debug.Log("Velocity:" + this.velocity);
 
 
+    }
+
+    private void FixedUpdate()
+    {
+        stateMachine.FixedUpdate();
     }
 
     private void CheckCollsion()
@@ -152,7 +163,7 @@ public class Player : BaseCharacter
         isOnGround = Physics2D.Raycast(rigidbody.position, Vector2.down, _groundCheckDistance, _WhatIsGround);
         isInWall = Physics2D.Raycast(rigidbody.position, Vector2.right * direction, _wallCheckDistance, _WhatIsGround);
 
-        anim.SetBool("IsOnGround", isOnGround);
+        //anim.SetBool("IsOnGround", isOnGround);
     }
 
     //绘制射线检测的线
@@ -185,9 +196,9 @@ public class Player : BaseCharacter
             _isFlip = false;
         }
 
-        if (_inputX == 1 && direction == -1)
+        if (inputX == 1 && direction == -1)
             Filp();
-        else if (_inputX == -1 && direction == 1)
+        else if (inputX == -1 && direction == 1)
             Filp();
 
     }
@@ -195,73 +206,73 @@ public class Player : BaseCharacter
 
     private void InputCheck()
     {
-        _inputX = Input.GetAxisRaw("Horizontal");
-        _inputY = Input.GetAxisRaw("Vertical");
+        inputX = Input.GetAxisRaw("Horizontal");
+        inputY = Input.GetAxisRaw("Vertical");
         //跳跃
         if (Input.GetKeyDown("space") && isOnGround)
-            _statemachine.ChangeState<PlayerAir>((int)PlayerState.Air);
+            stateMachine.ChangeState<PlayerJumpBehavior>(RoleAnimator.BehaviorNameAndNumToString(BehaviorContainer.RoleBehavior.Jump));
 
-        //释放时间冻结
-        if (Input.GetKeyDown("r") && _playerManager.GetSkill<FreezingTimeSkill>((int)PlayerManager.SkillName.FreezingTimeSkill).CanUseSkill())
-        {
-            _playerManager.GetSkill<FreezingTimeSkill>((int)PlayerManager.SkillName.FreezingTimeSkill).UseSkill();
-        }
-        //进行时间冻结后的衔接攻击
-        else if (isOnGround && Input.GetKeyDown("r") && FreezingTimeSkill.isCanCloneAttack)
-        {
-            _playerManager.GetSkill<FreezingTimeSkill>((int)PlayerManager.SkillName.FreezingTimeSkill).SetisCloneAttack(true);
-            _statemachine.ChangeState<PlayerHeavyAttackState>((int)PlayerState.HeavyAttack);
-            return;
-        }
-        //转移技能
-        if (Input.GetKeyDown("f") && _playerManager.GetSkill<TransferSkill>((int)PlayerManager.SkillName.TransferSkill).CanUseSkill())
-        {
-            _playerManager.GetSkill<TransferSkill>((int)PlayerManager.SkillName.TransferSkill).UseSkill();
-        }
-        else if (Input.GetKeyDown("f") && _playerManager.GetSkill<TransferSkill>((int)PlayerManager.SkillName.TransferSkill).objectIsActive)
-        {
-            _playerManager.GetSkill<TransferSkill>((int)PlayerManager.SkillName.TransferSkill).SetObjectIsTransferPlayer(true);
-        }
-
-
-
-        //冲刺
-        if (Input.GetKeyDown("left shift") && _playerManager.GetSkill<DashSkill>((int)SkillName.DashSkill).CanUseSkill())
-        {
-
-            _playerManager.UseSkill<DashSkill>((int)SkillName.DashSkill);
-            _inputX = Input.GetAxisRaw("Horizontal");
-            _statemachine.ChangeState<PlayerDash>((int)PlayerState.Dash);
-            return;
-        }
-
-        //普通攻击
-        if (isOnGround && Input.GetKeyDown("mouse 0"))
-        {
-
-            _statemachine.ChangeState<PlayerAttack1_1>((int)PlayerState.Attack1_1);
-            return;
-        }
+        ////释放时间冻结
+        //if (Input.GetKeyDown("r") && _playerManager.GetSkill<FreezingTimeSkill>((int)PlayerManager.SkillName.FreezingTimeSkill).CanUseSkill())
+        //{
+        //    _playerManager.GetSkill<FreezingTimeSkill>((int)PlayerManager.SkillName.FreezingTimeSkill).UseSkill();
+        //}
+        ////进行时间冻结后的衔接攻击
+        //else if (isOnGround && Input.GetKeyDown("r") && FreezingTimeSkill.isCanCloneAttack)
+        //{
+        //    _playerManager.GetSkill<FreezingTimeSkill>((int)PlayerManager.SkillName.FreezingTimeSkill).SetisCloneAttack(true);
+        //    _statemachine.ChangeState<PlayerHeavyAttackState>((int)PlayerState.HeavyAttack);
+        //    return;
+        //}
+        ////转移技能
+        //if (Input.GetKeyDown("f") && _playerManager.GetSkill<TransferSkill>((int)PlayerManager.SkillName.TransferSkill).CanUseSkill())
+        //{
+        //    _playerManager.GetSkill<TransferSkill>((int)PlayerManager.SkillName.TransferSkill).UseSkill();
+        //}
+        //else if (Input.GetKeyDown("f") && _playerManager.GetSkill<TransferSkill>((int)PlayerManager.SkillName.TransferSkill).objectIsActive)
+        //{
+        //    _playerManager.GetSkill<TransferSkill>((int)PlayerManager.SkillName.TransferSkill).SetObjectIsTransferPlayer(true);
+        //}
 
 
-        //进入瞄准状态
-        if (isOnGround && Input.GetKeyDown("mouse 1") && _playerManager.GetSkill<ThrowSwordSkill>((int)PlayerManager.SkillName.ThrowSwordSkill).CanUseSkill())
-        {
-            _statemachine.ChangeState<PlayerAimState>((int)PlayerState.Aim);
-            return;
-        }
-        else if (isOnGround && Input.GetKeyDown("mouse 1") && !_playerManager.GetSkill<ThrowSwordSkill>((int)PlayerManager.SkillName.ThrowSwordSkill).CanUseSkill())
-        {
-            _statemachine.ChangeState<PlayerBackSwordState>((int)PlayerState.BackSword);
-            return;
-        }
 
-        //进入尝试反击状态
-        if (isOnGround && Input.GetKeyDown("left ctrl"))
-        {
-            _statemachine.ChangeState<PlayerCrashAttack>((int)PlayerState.CrashAttack);
-            return;
-        }
+        ////冲刺
+        //if (Input.GetKeyDown("left shift") && _playerManager.GetSkill<DashSkill>((int)SkillName.DashSkill).CanUseSkill())
+        //{
+
+        //    _playerManager.UseSkill<DashSkill>((int)SkillName.DashSkill);
+        //    inputX = Input.GetAxisRaw("Horizontal");
+        //    _statemachine.ChangeState<PlayerDash>((int)PlayerState.Dash);
+        //    return;
+        //}
+
+        ////普通攻击
+        //if (isOnGround && Input.GetKeyDown("mouse 0"))
+        //{
+
+        //    _statemachine.ChangeState<PlayerAttack1_1>((int)PlayerState.Attack1_1);
+        //    return;
+        //}
+
+
+        ////进入瞄准状态
+        //if (isOnGround && Input.GetKeyDown("mouse 1") && _playerManager.GetSkill<ThrowSwordSkill>((int)PlayerManager.SkillName.ThrowSwordSkill).CanUseSkill())
+        //{
+        //    _statemachine.ChangeState<PlayerAimState>((int)PlayerState.Aim);
+        //    return;
+        //}
+        //else if (isOnGround && Input.GetKeyDown("mouse 1") && !_playerManager.GetSkill<ThrowSwordSkill>((int)PlayerManager.SkillName.ThrowSwordSkill).CanUseSkill())
+        //{
+        //    _statemachine.ChangeState<PlayerBackSwordState>((int)PlayerState.BackSword);
+        //    return;
+        //}
+
+        ////进入尝试反击状态
+        //if (isOnGround && Input.GetKeyDown("left ctrl"))
+        //{
+        //    _statemachine.ChangeState<PlayerCrashAttack>((int)PlayerState.CrashAttack);
+        //    return;
+        //}
 
 
 
@@ -269,22 +280,22 @@ public class Player : BaseCharacter
 
     public void SetIsInput(bool Is)
     {
-        _isInput = Is;
+        isInput = Is;
     }
 
     //IEnumerator函数可以通过yield return new 类型（）
     //让其运行中止一段时间后继续运行
     public IEnumerator DisableInputSecond(float Second = 0)
     {
-        _isInput = false;
+        isInput = false;
         yield return new WaitForSeconds(Second);
-        _isInput = true;
+        isInput = true;
 
     }
 
     public void SetInputX(float x)
     {
-        _inputX = x;
+        inputX = x;
     }
 
     public void Hit()
@@ -296,7 +307,7 @@ public class Player : BaseCharacter
 
     public void Dead()
     {
-        _isInput = false;
+        isInput = false;
         _isDead = true;
         _statemachine.ChangeState<PlayerDead>((int)PlayerState.Dead);
     }

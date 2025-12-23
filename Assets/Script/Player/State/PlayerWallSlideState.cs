@@ -39,12 +39,12 @@ public class PlayerWallSlideState : StateBase
         }
 
 
-        if (_player._inputX == _player.direction)
+        if (_player.inputX == _player.direction)
         {
             Debug.Log("减速滑墙");
             SetVelocity(_rigidbody.velocity.x, _downSpeed * 0.7f);
         }
-        else if (_player._inputY <= 0)
+        else if (_player.inputY <= 0)
         {
             Debug.Log("正常下落");
             SetVelocity(_rigidbody.velocity.x, _downSpeed);

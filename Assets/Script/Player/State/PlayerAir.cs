@@ -39,8 +39,8 @@ public class PlayerAir : StateBase
     {
         JumpTime -= Time.deltaTime;
         base.Update();
-        if (_player._inputX != 0)
-            SetVelocity(Speed * _player._inputX * 0.5f, _rigidbody.velocity.y);
+        if (_player.inputX != 0)
+            SetVelocity(Speed * _player.inputX * 0.5f, _rigidbody.velocity.y);
         else
             SetVelocity(_rigidbody.velocity.x, _rigidbody.velocity.y);
         if (_player.isOnGround && JumpTime < 0)

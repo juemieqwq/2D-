@@ -31,9 +31,9 @@ public class RoleStateMachine
     //当前状态
     public RoleBaseState currentRoleState;
 
-    //初始状态（用于转换失败时强行转换）
-    private RoleBaseState initRoleState;
-    private string initRoleStatekey;
+    ////初始状态（用于转换失败时强行转换）
+    //private RoleBaseState initRoleState;
+    //private string initRoleStatekey;
 
     //角色动画播放器
     public RoleAnimator roleAnimator { get; private set; }
@@ -54,9 +54,10 @@ public class RoleStateMachine
         this.hostInfo = host.GetGameObject().GetComponent<IRoleInfo>();
         this.roleAnimator = roleAnimator;
         roleState.Init(this, host, hostInfo, key);
+        roleState.Enter();
         this.currentRoleState = roleState;
         this.currentStateKey = key;
-        currentRoleState.Enter();
+
     }
 
     public bool ChangeState<T>(string key) where T : RoleBaseState, new()
@@ -131,13 +132,21 @@ public class RoleStateMachine
 
     public void Update()
     {
-        if (this.currentRoleState != null)
+        if (currentRoleState != null)
+        {
             currentRoleState.Update();
+            Debug.LogError("当前状态：" + currentRoleState);
+        }
+
+        else
+            Debug.LogError(string.Concat("角色：", host, "的当前状态为空，无法运行Update"));
     }
 
     public void FixedUpdate()
     {
-        if (this.currentRoleState != null)
+        if (currentRoleState != null)
             currentRoleState.FixedUpdate();
+        else
+            Debug.LogError(string.Concat("角色：", host, "的当前状态为空，无法运行FixedUpdate"));
     }
 }

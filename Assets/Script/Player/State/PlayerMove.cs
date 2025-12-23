@@ -15,8 +15,8 @@ public class PlayerMove : StateBase
     public override void Update()
     {
         base.Update();
-        SetVelocity(Speed * _player._inputX, _rigidbody.velocity.y);
-        if (_player._inputX == 0)
+        SetVelocity(Speed * _player.inputX, _rigidbody.velocity.y);
+        if (_player.inputX == 0)
         {
             _statemachine.ChangeState<PlayerIdle>((int)PlayerState.Idle);
         }

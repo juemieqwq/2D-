@@ -20,9 +20,9 @@ public class PlayerRunBehavior : RoleBaseState
     public override void Update()
     {
         base.Update();
-        inputX = host.GetGameObject().GetComponent<TestPlayer>().inputX;
+        inputX = (host as Player).inputX;
 
-        if (inputX == 0)
+        if (inputX == 0 && isOnGoround)
         {
             string key = RoleAnimator.BehaviorNameAndNumToString(BehaviorContainer.RoleBehavior.Idle, 1);
             hostStateMachine.ChangeState<PlayerIdleBehavior>(key);
@@ -33,6 +33,6 @@ public class PlayerRunBehavior : RoleBaseState
     {
         base.FixedUpdate();
         if (inputX != 0)
-            hostRigidbody2D.velocity = new Vector2(inputX * speed, 0);
+            hostRigidbody2D.velocity = new Vector2(inputX * speed, hostRigidbody2D.velocity.y);
     }
 }

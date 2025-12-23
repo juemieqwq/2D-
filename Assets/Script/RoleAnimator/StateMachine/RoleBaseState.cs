@@ -9,6 +9,10 @@ public class RoleBaseState
     protected IRole host;
     protected IRoleInfo hostInfo;
     protected Rigidbody2D hostRigidbody2D;
+    protected bool isOnGoround;
+    protected float inputX;
+    protected float inputY;
+
 
     protected bool isInit = false;
 
@@ -17,14 +21,6 @@ public class RoleBaseState
     public bool isFinish { get; private set; } = false;
     protected bool isLoop = true;
     public string key;
-
-
-    public void BindStatemachine(RoleStateMachine statemachine, IRole role, IRoleInfo roleInfo)
-    {
-        hostStateMachine = statemachine;
-        hostInfo = roleInfo;
-        host = role;
-    }
 
 
     public virtual void Init(RoleStateMachine statemachine, IRole role, IRoleInfo roleInfo, string key)
@@ -53,7 +49,13 @@ public class RoleBaseState
 
     public virtual void Update()
     {
-
+        if (host.GetType() == typeof(Player))
+        {
+            var player = host as Player;
+            this.isOnGoround = player.isOnGround;
+            this.inputX = player.inputX;
+            this.inputY = player.inputY;
+        }
     }
 
     public virtual void FixedUpdate()

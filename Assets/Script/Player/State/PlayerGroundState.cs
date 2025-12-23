@@ -9,9 +9,9 @@ public class PlayerGroundState : StateBase
     {
 
         Debug.Log("进入地面中转");
-        if (_player._inputX != 0)
+        if (_player.inputX != 0)
             _statemachine.ChangeState<PlayerMove>((int)PlayerState.Move);
-        else if (_player._inputX == 0)
+        else if (_player.inputX == 0)
         {
             SetVelocity(0, 0);
             _statemachine.ChangeState<PlayerIdle>((int)PlayerState.Idle);

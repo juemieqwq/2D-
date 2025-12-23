@@ -16,7 +16,7 @@ public class PlayerIdle : StateBase
     {
         base.Update();
 
-        if (_player._inputX != 0)
+        if (_player.inputX != 0)
             _statemachine.ChangeState<PlayerMove>((int)PlayerState.Move);
         else if (!_player.isOnGround)
             _statemachine.ChangeState<PlayerAirState>(-1);
