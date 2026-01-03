@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
@@ -41,7 +42,8 @@ public class UIManager : MonoBehaviour
                 // 如果场景中没有EventSystem，可以自动添加
                 GameObject eventSystem = new GameObject("EventSystem");
                 eventSystem.AddComponent<EventSystem>();
-                eventSystem.AddComponent<StandaloneInputModule>();
+                //eventSystem.AddComponent<StandaloneInputModule>();
+                eventSystem.AddComponent<InputSystemUIInputModule>();
             }
 
             DontDestroyOnLoad(gameObject);
@@ -107,47 +109,47 @@ public class UIManager : MonoBehaviour
         return true;
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown("tab"))
-        {
-            if (runningPanels.ContainsKey("PackagePanel"))
-            {
-                ClosePanel("PackagePanel");
-            }
-            else
-                OpenPanel("PackagePanel");
-        }
+    //private void Update()
+    //{
+    //    if (Input.GetKeyDown("tab"))
+    //    {
+    //        if (runningPanels.ContainsKey("PackagePanel"))
+    //        {
+    //            ClosePanel("PackagePanel");
+    //        }
+    //        else
+    //            OpenPanel("PackagePanel");
+    //    }
 
-        if (Input.GetKeyDown("o"))
-        {
-            BasePanel packagePanel;
-            if (runningPanels.TryGetValue("PackagePanel", out packagePanel))
-            {
-                var info = packageItemTable.GetPackageItemInfo(ItemName.Ruby);
-                (packagePanel as PackagePanel).AddItem(ItemName.Ruby, ItemRarity.Epic);
-            }
-            else if (cachePanels.TryGetValue("PackagePanel", out packagePanel))
-            {
-                var info = packageItemTable.GetPackageItemInfo(ItemName.Ruby);
-                (packagePanel as PackagePanel).AddItem(ItemName.Ruby, ItemRarity.Epic);
-            }
-        }
+    //    if (Input.GetKeyDown("o"))
+    //    {
+    //        BasePanel packagePanel;
+    //        if (runningPanels.TryGetValue("PackagePanel", out packagePanel))
+    //        {
+    //            var info = packageItemTable.GetPackageItemInfo(ItemName.Ruby);
+    //            (packagePanel as PackagePanel).AddItem(ItemName.Ruby, ItemRarity.Epic);
+    //        }
+    //        else if (cachePanels.TryGetValue("PackagePanel", out packagePanel))
+    //        {
+    //            var info = packageItemTable.GetPackageItemInfo(ItemName.Ruby);
+    //            (packagePanel as PackagePanel).AddItem(ItemName.Ruby, ItemRarity.Epic);
+    //        }
+    //    }
 
-        if (Input.GetKeyDown("p"))
-        {
-            BasePanel packagePanel;
-            if (runningPanels.TryGetValue("PackagePanel", out packagePanel))
-            {
-                var info = packageItemTable.GetPackageItemInfo(ItemName.SilverBreastplate);
-                (packagePanel as PackagePanel).AddItem(ItemName.SilverBreastplate, ItemRarity.Legendary);
-            }
-            else if (cachePanels.TryGetValue("PackagePanel", out packagePanel))
-            {
-                var info = packageItemTable.GetPackageItemInfo(ItemName.Ruby);
-                (packagePanel as PackagePanel).AddItem(ItemName.SilverBreastplate, ItemRarity.Legendary);
-            }
-        }
-    }
+    //    if (Input.GetKeyDown("p"))
+    //    {
+    //        BasePanel packagePanel;
+    //        if (runningPanels.TryGetValue("PackagePanel", out packagePanel))
+    //        {
+    //            var info = packageItemTable.GetPackageItemInfo(ItemName.SilverBreastplate);
+    //            (packagePanel as PackagePanel).AddItem(ItemName.SilverBreastplate, ItemRarity.Legendary);
+    //        }
+    //        else if (cachePanels.TryGetValue("PackagePanel", out packagePanel))
+    //        {
+    //            var info = packageItemTable.GetPackageItemInfo(ItemName.Ruby);
+    //            (packagePanel as PackagePanel).AddItem(ItemName.SilverBreastplate, ItemRarity.Legendary);
+    //        }
+    //    }
+    //}
 
 }

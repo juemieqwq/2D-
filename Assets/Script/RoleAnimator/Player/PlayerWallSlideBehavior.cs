@@ -29,7 +29,7 @@ public class PlayerWallSlideBehavior : PlayerBaseState
     public override void FixedUpdate()
     {
         base.FixedUpdate();
-        if (Input.GetAxisRaw("Horizontal") == player.direction)
+        if (controller.inputX.valueFloat == player.direction)
         {
             hostRigidbody2D.velocity = reduceFallVelocity;
         }
@@ -51,8 +51,9 @@ public class PlayerWallSlideBehavior : PlayerBaseState
             hostStateMachine.ChangeState<PlayerFallBehavior>("Fall1");
             return;
         }
-        else if (Input.GetKeyDown("space"))
+        else if (controller.jump.isPressed)
         {
+
             hostStateMachine.ChangeState<PlayerTouchWallJumpBehavior>("Jump2");
             return;
         }

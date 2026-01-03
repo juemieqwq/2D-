@@ -35,7 +35,7 @@ public class PlayerDashBehavior : PlayerBaseState
             hostRigidbody2D.velocity = new Vector2(dashSpeed * player.direction, 0);
 
 
-        if (Input.GetKeyDown("mouse 0"))
+        if (controller.mouse0.isPressed)
         {
             isHeavyAttack = true;
             hostStateMachine.ChangeState<PlayerHeavyAttackBehavior>("Attack3");

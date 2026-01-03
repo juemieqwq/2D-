@@ -44,11 +44,11 @@ public class PlayerWallSlideState : StateBase
             Debug.Log("减速滑墙");
             SetVelocity(_rigidbody.velocity.x, _downSpeed * 0.7f);
         }
-        else if (_player.inputY <= 0)
-        {
-            Debug.Log("正常下落");
-            SetVelocity(_rigidbody.velocity.x, _downSpeed);
-        }
+        //else if (_player.inputY <= 0)
+        //{
+        //    Debug.Log("正常下落");
+        //    SetVelocity(_rigidbody.velocity.x, _downSpeed);
+        //}
 
     }
 }

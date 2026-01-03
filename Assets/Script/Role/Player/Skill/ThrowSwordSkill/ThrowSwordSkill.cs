@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
+using UnityEngine.InputSystem;
 
 public class ThrowSwordSkill : BaseSkill
 {
@@ -60,7 +61,7 @@ public class ThrowSwordSkill : BaseSkill
     {
         if (playerCamera == null)
             playerCamera = _player.transform.parent.GetComponentInChildren<Camera>();
-        Vector2 throwDirection = (Vector2)playerCamera.ScreenToWorldPoint(Input.mousePosition) - (Vector2)_player.transform.position;
+        Vector2 throwDirection = (Vector2)playerCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue()) - (Vector2)_player.transform.position;
         return throwDirection.normalized;
     }
 

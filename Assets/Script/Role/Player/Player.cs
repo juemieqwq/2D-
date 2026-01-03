@@ -5,6 +5,7 @@ using UnityEngine.TextCore.Text;
 using static UnityEditor.Experimental.GraphView.GraphView;
 using static PlayerManager;
 using UnityEngine.Assertions;
+using System;
 
 public class Player : BaseCharacter
 {
@@ -21,24 +22,12 @@ public class Player : BaseCharacter
     private RoleAnimator roleAnimator;
     #endregion
 
-    #region 射线检测
-    [Header("角色射线检测")]
-    //检测地板所在的图层
-    private LayerMask _WhatIsGround;
-    //检测墙体所在的图层
-    private LayerMask _WhatIsWall;
-    //检测地板的距离
-    [SerializeField]
-    private float _groundCheckDistance = 0.4f;
-    [SerializeField]
-    private float _wallCheckDistance = 0.16f;
-    #endregion
-
     #region 输入的相关变量
+    //输入控制类
+    public PlayerController playerController { get; private set; }
+
     //X轴输入信息
     public float inputX { get; private set; }
-    //Y轴输入信息
-    public float inputY { get; private set; }
 
 
     //是否检测输入
@@ -93,14 +82,27 @@ public class Player : BaseCharacter
     public PlayerInfo _playerInfo { get; private set; }
     //玩家相机
     public Camera _playerCamera;
+    private PhysicalDetection physicalDetection;
 
-
+    #region 碰撞检测
+    [SerializeField]
+    private Transform detectionGroundFront;
+    [SerializeField]
+    private Transform detectionGroundBack;
+    [SerializeField]
+    private Transform detectionWall;
+    private Collider2D[] collider2Ds;
+    private RaycastHit2D[] rayCastHit2Ds;
+    #endregion
     void Start()
     {   //角色组件的初始化
+        physicalDetection = GetComponent<PhysicalDetection>();
+
         anim = GetComponentInChildren<Animator>();
         rigidbody = GetComponent<Rigidbody2D>();
         _playerInfo = GetComponent<PlayerInfo>();
         _playerCamera = transform.parent.GetComponentInChildren<Camera>();
+        playerController = GetComponent<PlayerController>();
         Assert.IsNotNull(_playerCamera, (this + "玩家相机为空"));
         Assert.IsNotNull(_playerInfo, (this + "玩家信息类为空"));
         //获取角色场景单例
@@ -114,8 +116,6 @@ public class Player : BaseCharacter
         //要自己new成初始状态，不然StateMachine内的当前为：RoleBaseState类
         currentState = new PlayerIdleBehavior();
         stateMachine = new RoleStateMachine(this, roleAnimator, currentState, RoleAnimator.BehaviorNameAndNumToString(BehaviorContainer.RoleBehavior.Idle));
-        _WhatIsGround = LayerMask.GetMask("Ground");
-        _WhatIsWall = LayerMask.GetMask("Wall");
         //gameObject是实例（当前对象）
         //GameObject是类（当前场景）
         _selfLayerMask = gameObject.layer;
@@ -137,11 +137,11 @@ public class Player : BaseCharacter
         stateMachine.Update();
         ControlFilp();
         //Debug.Log("isOnGround:" + isOnGround);
+        Debug.Log("wall:" + isTouchWall);
         //Debug.Log("CoolTime:" + _coolTime);
         this.velocity = rigidbody.velocity;
-        //anim.SetFloat("VelocityY", velocity.y);
-        //anim.SetFloat("VelocityX", velocity.x);
-        // Debug.Log("Velocity:" + this.velocity);
+
+
 
 
     }
@@ -160,25 +160,58 @@ public class Player : BaseCharacter
         //Physics2D.OverlapCircle(transform.position, 5f, filter, overlapResults)；
         //获取过滤的List<Collider2D>列表
         //在通过foreach(Collider2D col in overlapResults)和col.GetComponent<标签类>()过滤标签；
-        isOnGround = Physics2D.Raycast(rigidbody.position, Vector2.down, _groundCheckDistance, _WhatIsGround);
-        isTouchWall = Physics2D.Raycast(rigidbody.position, Vector2.right * direction, _wallCheckDistance, _WhatIsGround);
-
-        //anim.SetBool("IsOnGround", isOnGround);
+        IsOnGround();
+        isTouchWall = IsCrash(detectionWall, typeof(Collider2D));
     }
 
-    //绘制射线检测的线
-    private void OnDrawGizmosSelected()
+    private bool IsCrash(Transform key, Type type)
     {
-        if (rigidbody != null)
-        {   //检测地面的线
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(rigidbody.transform.position, new Vector3(rigidbody.position.x, rigidbody.position.y - _groundCheckDistance, rigidbody.transform.position.z));
-            //检测墙体的线
-            Gizmos.color = Color.blue;
-            Gizmos.DrawLine(rigidbody.transform.position, new Vector3(rigidbody.position.x + _wallCheckDistance * direction, rigidbody.position.y, rigidbody.transform.position.z));
+        if (type == typeof(Collider2D))
+        {
+            collider2Ds = physicalDetection.DicColliders.GetValueOrDefault(key);
+            if (collider2Ds?.Length > 0)
+                return true;
+        }
+        else if (type == typeof(RaycastHit2D))
+        {
+            rayCastHit2Ds = physicalDetection.DicRaycastHits.GetValueOrDefault(key);
+            if (rayCastHit2Ds?.Length > 0)
+                return true;
+        }
+
+        return false;
+    }
+
+
+    private void IsOnGround()
+    {
+        collider2Ds = physicalDetection.DicColliders.GetValueOrDefault(detectionGroundFront);
+        if (collider2Ds?.Length > 0)
+            isOnGround = true;
+        else
+        {
+            collider2Ds = physicalDetection.DicColliders.GetValueOrDefault(detectionGroundBack);
+            if (collider2Ds?.Length > 0)
+                isOnGround = true;
+            else
+                isOnGround = false;
 
         }
     }
+
+    ////绘制射线检测的线
+    //private void OnDrawGizmosSelected()
+    //{
+    //    if (rigidbody != null)
+    //    {   //检测地面的线
+    //        Gizmos.color = Color.green;
+    //        Gizmos.DrawLine(rigidbody.transform.position, new Vector3(rigidbody.position.x, rigidbody.position.y - _groundCheckDistance, rigidbody.transform.position.z));
+    //        //检测墙体的线
+    //        Gizmos.color = Color.blue;
+    //        Gizmos.DrawLine(rigidbody.transform.position, new Vector3(rigidbody.position.x + _wallCheckDistance * direction, rigidbody.position.y, rigidbody.transform.position.z));
+
+    //    }
+    //}
 
     public void Filp()
     {
@@ -208,30 +241,29 @@ public class Player : BaseCharacter
 
     private void InputCheck()
     {
-        inputX = Input.GetAxisRaw("Horizontal");
-        inputY = Input.GetAxisRaw("Vertical");
+        inputX = playerController.inputX.valueFloat;
         //跳跃
-        if (Input.GetKeyDown("space") && isOnGround)
+        if (playerController.jump.isPressed && isOnGround)
             stateMachine.ChangeState<PlayerJumpBehavior>(RoleAnimator.BehaviorNameAndNumToString(BehaviorContainer.RoleBehavior.Jump));
 
         ////释放时间冻结
-        if (Input.GetKeyDown("r") && _playerManager.GetSkill<FreezingTimeSkill>((int)PlayerManager.SkillName.FreezingTimeSkill).CanUseSkill())
+        if (playerController.skillFreezeTime.isPressed && _playerManager.GetSkill<FreezingTimeSkill>((int)PlayerManager.SkillName.FreezingTimeSkill).CanUseSkill())
         {
             _playerManager.GetSkill<FreezingTimeSkill>((int)PlayerManager.SkillName.FreezingTimeSkill).UseSkill();
         }
         //进行时间冻结后的衔接攻击
-        else if (isOnGround && Input.GetKeyDown("r") && FreezingTimeSkill.isCanCloneAttack)
+        else if (playerController.skillFreezeTime.isPressed && FreezingTimeSkill.isCanCloneAttack)
         {
             _playerManager.GetSkill<FreezingTimeSkill>((int)PlayerManager.SkillName.FreezingTimeSkill).SetisCloneAttack(true);
             stateMachine.ChangeState<PlayerHeavyAttackBehavior>(("Attack3"));
             return;
         }
         ////转移技能
-        if (Input.GetKeyDown("f") && _playerManager.GetSkill<TransferSkill>((int)PlayerManager.SkillName.TransferSkill).CanUseSkill())
+        if (playerController.skillTransfer.isPressed && _playerManager.GetSkill<TransferSkill>((int)PlayerManager.SkillName.TransferSkill).CanUseSkill())
         {
             _playerManager.GetSkill<TransferSkill>((int)PlayerManager.SkillName.TransferSkill).UseSkill();
         }
-        else if (Input.GetKeyDown("f") && _playerManager.GetSkill<TransferSkill>((int)PlayerManager.SkillName.TransferSkill).objectIsActive)
+        else if (playerController.skillTransfer.isPressed && _playerManager.GetSkill<TransferSkill>((int)PlayerManager.SkillName.TransferSkill).objectIsActive)
         {
             _playerManager.GetSkill<TransferSkill>((int)PlayerManager.SkillName.TransferSkill).SetObjectIsTransferPlayer(true);
         }
@@ -239,7 +271,7 @@ public class Player : BaseCharacter
 
 
         ////冲刺
-        if (Input.GetKeyDown("left shift") && _playerManager.GetSkill<DashSkill>((int)SkillName.DashSkill).CanUseSkill())
+        if (playerController.dash.isPressed && _playerManager.GetSkill<DashSkill>((int)SkillName.DashSkill).CanUseSkill())
         {
 
             _playerManager.UseSkill<DashSkill>((int)SkillName.DashSkill);
@@ -248,7 +280,7 @@ public class Player : BaseCharacter
         }
 
         //普通攻击
-        if (isOnGround && Input.GetKeyDown("mouse 0"))
+        if (isOnGround && playerController.mouse0.isPressed)
         {
 
             stateMachine.ChangeState<PlayerAttackBehavior>("Attack1");
@@ -257,23 +289,23 @@ public class Player : BaseCharacter
 
 
         //进入瞄准状态
-        if (isOnGround && Input.GetKeyDown("mouse 1") && _playerManager.GetSkill<ThrowSwordSkill>((int)PlayerManager.SkillName.ThrowSwordSkill).CanUseSkill())
+        if (isOnGround && playerController.mouse1.isPressed && _playerManager.GetSkill<ThrowSwordSkill>((int)PlayerManager.SkillName.ThrowSwordSkill).CanUseSkill())
         {
             stateMachine.ChangeState<PlayerAimBehaviour>("Aim1");
             return;
         }
-        else if (isOnGround && Input.GetKeyDown("mouse 1") && !_playerManager.GetSkill<ThrowSwordSkill>((int)PlayerManager.SkillName.ThrowSwordSkill).CanUseSkill())
+        else if (isOnGround && playerController.mouse1.isPressed && !_playerManager.GetSkill<ThrowSwordSkill>((int)PlayerManager.SkillName.ThrowSwordSkill).CanUseSkill())
         {
             stateMachine.ChangeState<PlayerBackSwordBehavior>("Aim2");
             return;
         }
 
-        ////进入尝试反击状态
-        if (isOnGround && Input.GetKeyDown("left ctrl"))
-        {
-            stateMachine.ChangeState<PlayerCrashAttackBehavior>("CrashAttack1");
-            return;
-        }
+        //////进入尝试反击状态
+        //if (isOnGround && Input.GetKeyDown("left ctrl"))
+        //{
+        //    stateMachine.ChangeState<PlayerCrashAttackBehavior>("CrashAttack1");
+        //    return;
+        //}
 
 
 

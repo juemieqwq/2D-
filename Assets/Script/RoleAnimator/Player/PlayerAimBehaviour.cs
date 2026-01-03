@@ -1,18 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using static SwordObject;
 using static UnityEditor.Experimental.GraphView.GraphView;
 
-public class PlayerAimBehaviour : RoleBaseState
+public class PlayerAimBehaviour : PlayerBaseState
 {
     private Camera playerCamera;
-    private Player player;
     private bool isThrowSword;
     public override void Enter()
     {
-        if (player == null)
-            player = (host as Player);
+        PlayerInit();
         base.Enter();
         player.SetIsInput(false);
         PlayerManager.instance.SetDotsActive(true);
@@ -44,7 +43,7 @@ public class PlayerAimBehaviour : RoleBaseState
             PlayerManager.instance.GetSkill<ThrowSwordSkill>((int)PlayerManager.SkillName.ThrowSwordSkill)?.StraightLineAim();
         if (IsStopUpdate(1))
             return;
-        if (Input.GetKeyDown("mouse 0"))
+        if (controller.mouse0.isPressed)
         {
             if (PlayerManager.instance.GetSkill<ThrowSwordSkill>((int)PlayerManager.SkillName.ThrowSwordSkill).CanUseSkill())
             {
@@ -58,9 +57,9 @@ public class PlayerAimBehaviour : RoleBaseState
             }
             return;
         }
-        else if (Input.anyKeyDown || Input.GetKeyUp("mouse 1"))
+        else if (Keyboard.current.anyKey.wasPressedThisFrame || controller.mouse1.isReleased)
         {
-            if (Input.GetKeyDown("t"))
+            if (controller.changeThrowSword.isPressing)
                 return;
             isThrowSword = false;
             hostStateMachine.ChangeState<PlayerIdleBehavior>("Idle1");
@@ -74,7 +73,7 @@ public class PlayerAimBehaviour : RoleBaseState
         {
             playerCamera = player.transform.parent.GetComponentInChildren<Camera>();
         }
-        Vector2 mousePosition = playerCamera.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 mousePosition = playerCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         if (mousePosition.x - player.transform.position.x > 0 && player.direction == -1)
         {
             player.Filp();

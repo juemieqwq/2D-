@@ -69,7 +69,6 @@ public class RoleBaseState
             var player = host as Player;
             this.isOnGoround = player.isOnGround;
             this.inputX = player.inputX;
-            this.inputY = player.inputY;
         }
     }
 

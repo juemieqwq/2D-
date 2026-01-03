@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAttackBehavior : RoleBaseState
+public class PlayerAttackBehavior : PlayerBaseState
 {
     bool continuousAttack;
     int currentAttacknum;
-    Player player;
+
     //用于跳过帧几帧
     int skipFrames;
 
@@ -14,8 +14,7 @@ public class PlayerAttackBehavior : RoleBaseState
     {
         skipFrames = 2;
         isLoop = false;
-        player = (host as Player);
-        player.SetIsInput(false);
+        PlayerInit();
         hostRigidbody2D.velocity = new Vector2(0, hostRigidbody2D.velocity.y);
         base.Enter();
         continuousAttack = false;
@@ -41,7 +40,7 @@ public class PlayerAttackBehavior : RoleBaseState
             skipFrames--;
             return;
         }
-        if (Input.GetKeyDown("mouse 0"))
+        if (controller.mouse0.isPressed)
             continuousAttack = true;
         if (isFinish && !continuousAttack)
         {
@@ -65,5 +64,6 @@ public class PlayerAttackBehavior : RoleBaseState
             }
 
         }
+
     }
 }

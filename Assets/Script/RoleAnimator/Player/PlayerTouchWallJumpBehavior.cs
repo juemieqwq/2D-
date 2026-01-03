@@ -11,7 +11,6 @@ public class PlayerTouchWallJumpBehavior : PlayerBaseState
         isLoop = false;
         base.Enter();
         base.PlayerInit();
-        Debug.LogError(player.direction);
         hostRigidbody2D.velocity = new Vector2(hostInfo.GetInfo(GetInfoType.Speed) * -.5f * player.direction, hostInfo.GetInfo(GetInfoType.ForceJump));
         player.Filp();
     }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class PlayerBackSwordBehavior : PlayerBaseState
@@ -38,7 +39,7 @@ public class PlayerBackSwordBehavior : PlayerBaseState
             return;
 
 
-        if (Input.GetKeyDown("mouse 0"))
+        if (controller.mouse0.isPressed)
         {
 
             hit = Physics2D.Raycast(player.transform.position, PlayerManager.instance.GetSkill<ThrowSwordSkill>((int)PlayerManager.SkillName.ThrowSwordSkill).GetThrowSwordDirection(), 15f, LayerMask.GetMask("Skill"));
@@ -54,7 +55,7 @@ public class PlayerBackSwordBehavior : PlayerBaseState
             hostStateMachine.ChangeState<PlayerIdleBehavior>("Idle1");
             return;
         }
-        else if (Input.anyKeyDown || Input.GetKeyUp("mouse 1"))
+        else if (Keyboard.current.anyKey.wasPressedThisFrame || controller.mouse1.isReleased)
         {
             hostStateMachine.ChangeState<PlayerIdleBehavior>("Idle1");
             return;
@@ -67,7 +68,7 @@ public class PlayerBackSwordBehavior : PlayerBaseState
     private void PlayerDiretionFollowMouse()
     {
 
-        Vector2 mousePosition = (Vector2)player._playerCamera.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 mousePosition = (Vector2)player._playerCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         if (mousePosition.x - player.transform.position.x > 0 && player.direction == -1)
         {
             player.Filp();

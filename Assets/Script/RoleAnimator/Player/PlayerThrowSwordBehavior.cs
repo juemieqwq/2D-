@@ -27,7 +27,7 @@ public class PlayerThrowSwordBehavior : RoleBaseState
         if (isFinish)
         {
             //PlayerManager.instance.UseSkill<ThrowSwordSkill>((int)PlayerManager.SkillName.ThrowSwordSkill);
-            hostStateMachine.ChangeState<PlayerThrowSwordBehavior>("Idle1");
+            hostStateMachine.ChangeState<PlayerIdleBehavior>("Idle1");
         }
     }
 }
