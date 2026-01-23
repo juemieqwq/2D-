@@ -15,6 +15,8 @@ public class BackGround : MonoBehaviour
     private float _parallaxEffectX = 0;
     [SerializeField]
     private float _parallaxEffectY = 0;
+    [SerializeField]
+    private Vector2 parallaxOffset;
     void Start()
     {
         if (_camera == null)
@@ -22,7 +24,9 @@ public class BackGround : MonoBehaviour
         _beginPosition = transform.position;
         _length = (int)GetComponentInChildren<SpriteRenderer>().bounds.size.x + 1;
         //Debug.Log("_length" + _length);
-        _player = GameObject.FindAnyObjectByType<Player>();
+        _player = PlayerManager.instance.player;
+        if (_player == null)
+            _player = GameObject.FindAnyObjectByType<Player>();
         //Debug.Log("Playaer" + _player);
         _dvalue = 0;
     }
@@ -42,9 +46,9 @@ public class BackGround : MonoBehaviour
             Debug.Log(this + "的相机为空");
 
         if (_moveDistanceX != 0)
-            transform.position = new Vector3(_beginPosition.x + _moveDistanceX + _dvalue, transform.position.y);
+            transform.position = new Vector3(_beginPosition.x + _moveDistanceX + _dvalue + parallaxOffset.x, transform.position.y);
         if (_moveDistanceY != 0)
-            transform.position = new Vector3(transform.position.x, _beginPosition.y + _moveDistanceY);
+            transform.position = new Vector3(transform.position.x, _beginPosition.y + _moveDistanceY + parallaxOffset.y);
 
         //使背景进行无限循环X轴上
         if (transform.position.x - _camera.transform.position.x > _length / 2)

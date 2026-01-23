@@ -19,9 +19,7 @@ public struct InputActionBaseInfo
 public class PlayerController : MonoBehaviour
 {
 
-    private PlayerControl inputActions;
-
-
+    public PlayerControl inputActions { get; private set; }
 
     public InputActionBaseInfo mouse0;
     public InputActionBaseInfo mouse1;
@@ -31,6 +29,7 @@ public class PlayerController : MonoBehaviour
     public InputActionBaseInfo skillFreezeTime;
     public InputActionBaseInfo changeThrowSword;
     public InputActionBaseInfo skillTransfer;
+    public InputActionBaseInfo interaction;
 
     private void Awake()
     {
@@ -40,13 +39,14 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        InitInputActionInfo<Null>(ref mouse0, inputActions.PlayingGame.Attack);
-        InitInputActionInfo<Null>(ref mouse1, inputActions.PlayingGame.Mouse1);
-        InitInputActionInfo<Null>(ref jump, inputActions.PlayingGame.Jump);
-        InitInputActionInfo<Null>(ref dash, inputActions.PlayingGame.Dash);
-        InitInputActionInfo<float>(ref inputX, inputActions.PlayingGame.Move);
-        InitInputActionInfo<Null>(ref skillFreezeTime, inputActions.PlayingGame.FreezeTime);
-        InitInputActionInfo<Null>(ref skillTransfer, inputActions.PlayingGame.Transfer);
+        UpdateInputActionInfo<Null>(ref mouse0, inputActions.PlayingGame.Attack);
+        UpdateInputActionInfo<Null>(ref mouse1, inputActions.PlayingGame.Mouse1);
+        UpdateInputActionInfo<Null>(ref jump, inputActions.PlayingGame.Jump);
+        UpdateInputActionInfo<Null>(ref dash, inputActions.PlayingGame.Dash);
+        UpdateInputActionInfo<float>(ref inputX, inputActions.PlayingGame.Move);
+        UpdateInputActionInfo<Null>(ref skillFreezeTime, inputActions.PlayingGame.FreezeTime);
+        UpdateInputActionInfo<Null>(ref skillTransfer, inputActions.PlayingGame.Transfer);
+        UpdateInputActionInfo<Null>(ref interaction, inputActions.PlayingGame.Interaction);
 
     }
 
@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviour
         inputActions.Disable();
     }
 
-    private void InitInputActionInfo<T>(ref InputActionBaseInfo inputAction, InputAction input)
+    private void UpdateInputActionInfo<T>(ref InputActionBaseInfo inputAction, InputAction input)
     {
         inputAction.isPressed = input.WasPressedThisFrame();
         inputAction.isPressing = input.IsPressed();

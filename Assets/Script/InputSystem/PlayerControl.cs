@@ -199,6 +199,15 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Interaction"",
+                    ""type"": ""Button"",
+                    ""id"": ""4d57ab2e-fec4-4b65-8fea-67170f1d280c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""Tap(duration=0.3),SlowTap(duration=0.3,pressPoint=0.3)"",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -432,6 +441,17 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5ac84555-f244-41db-ba2e-03cd37fe59b2"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interaction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -1029,6 +1049,7 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
         m_PlayingGame_FreezeTime = m_PlayingGame.FindAction("FreezeTime", throwIfNotFound: true);
         m_PlayingGame_ChangeThrowSwordType = m_PlayingGame.FindAction("ChangeThrowSwordType", throwIfNotFound: true);
         m_PlayingGame_Transfer = m_PlayingGame.FindAction("Transfer", throwIfNotFound: true);
+        m_PlayingGame_Interaction = m_PlayingGame.FindAction("Interaction", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1134,6 +1155,7 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayingGame_FreezeTime;
     private readonly InputAction m_PlayingGame_ChangeThrowSwordType;
     private readonly InputAction m_PlayingGame_Transfer;
+    private readonly InputAction m_PlayingGame_Interaction;
     /// <summary>
     /// Provides access to input actions defined in input action map "PlayingGame".
     /// </summary>
@@ -1193,6 +1215,10 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "PlayingGame/Transfer".
         /// </summary>
         public InputAction @Transfer => m_Wrapper.m_PlayingGame_Transfer;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayingGame/Interaction".
+        /// </summary>
+        public InputAction @Interaction => m_Wrapper.m_PlayingGame_Interaction;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1255,6 +1281,9 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
             @Transfer.started += instance.OnTransfer;
             @Transfer.performed += instance.OnTransfer;
             @Transfer.canceled += instance.OnTransfer;
+            @Interaction.started += instance.OnInteraction;
+            @Interaction.performed += instance.OnInteraction;
+            @Interaction.canceled += instance.OnInteraction;
         }
 
         /// <summary>
@@ -1302,6 +1331,9 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
             @Transfer.started -= instance.OnTransfer;
             @Transfer.performed -= instance.OnTransfer;
             @Transfer.canceled -= instance.OnTransfer;
+            @Interaction.started -= instance.OnInteraction;
+            @Interaction.performed -= instance.OnInteraction;
+            @Interaction.canceled -= instance.OnInteraction;
         }
 
         /// <summary>
@@ -1686,6 +1718,13 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnTransfer(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Interaction" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnInteraction(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

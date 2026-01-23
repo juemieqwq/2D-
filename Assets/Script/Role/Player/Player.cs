@@ -94,6 +94,7 @@ public class Player : BaseCharacter
     private RaycastHit2D[] rayCastHit2Ds;
     #endregion
 
+
     void Start()
     {   //角色组件的初始化
         physicalDetection = GetComponent<PhysicalDetection>();

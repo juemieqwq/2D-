@@ -1,16 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class PlayerHitBehavior : RoleBaseState
+public class PlayerHitBehavior : PlayerBaseState
 {
     float time;
-    Player player;
     public override void Enter()
     {
         isLoop = false;
-        if (player == null)
-            player = (host as Player);
+        PlayerInit();
         base.Enter();
         hostRigidbody2D.velocity = new Vector2(0, hostRigidbody2D.velocity.y);
         time = 0;
@@ -31,7 +30,7 @@ public class PlayerHitBehavior : RoleBaseState
     {
         base.Update();
         time += Time.deltaTime;
-        if (time > 0.2f && Input.anyKeyDown)
+        if (time > 0.2f && Keyboard.current.anyKey.wasPressedThisFrame)
         {
             hostStateMachine.ChangeState<PlayerIdleBehavior>("Idle1");
         }

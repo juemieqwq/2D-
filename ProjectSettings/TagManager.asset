@@ -7,6 +7,8 @@ TagManager:
   - UI
   - CharacterController
   - CameraBound
+  - CanInteraction
+  - PlayerSpawn
   layers:
   - Default
   - TransparentFX

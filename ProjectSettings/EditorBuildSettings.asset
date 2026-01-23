@@ -5,8 +5,9 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Mian.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 0e8ff8d3b54a23a48bebb134b77c73d4, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 8f979ff9ed90b9f459d98194131ca9e3, type: 3}
