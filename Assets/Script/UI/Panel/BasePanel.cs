@@ -16,10 +16,10 @@ public class BasePanel : MonoBehaviour
             canvasGroup.alpha = 1;
             canvasGroup.blocksRaycasts = true;
             canvasGroup.interactable = true;
-            Time.timeScale = 0;
+            //Time.timeScale = 0;
         }
         else
-            Debug.LogError("canvasGroup为空" + this.name + "面板打开错误");
+            Debug.LogError("canvasGroup为空" + this.name);
         isRemove = false;
     }
 
@@ -33,7 +33,7 @@ public class BasePanel : MonoBehaviour
 
         }
         else
-            Debug.LogError("canvasGroup为空" + this.name + "面板关闭错误");
+            Debug.LogError("canvasGroup为空" + this.name);
         if (UIManager.Instance.runningPanels.ContainsKey(name))
         {
             UIManager.Instance.runningPanels.Remove(name);

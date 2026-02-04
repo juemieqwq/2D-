@@ -10,8 +10,8 @@ public class PlayerWallSlideBehavior : PlayerBaseState
     protected override void PlayerInit()
     {
         base.PlayerInit();
-        normalFallVelocity = new Vector2(0, -2);
-        reduceFallVelocity = new Vector2(0, -1);
+        normalFallVelocity = new Vector2(0, -3);
+        reduceFallVelocity = new Vector2(0, -1.5f);
     }
 
     public override void Enter()

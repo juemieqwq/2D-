@@ -2,13 +2,14 @@ using Cinemachine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.TextCore.Text;
 using static PlayerManager;
 using static UnityEditor.Experimental.GraphView.GraphView;
 
-public class Player : BaseCharacter
+public class Player : BaseCharacter, ISaveableGameObject
 {
 
     //玩家动画事件类
@@ -71,7 +72,7 @@ public class Player : BaseCharacter
 
     public LayerMask _selfLayerMask;
     //角色是否死亡
-    private bool _isDead = false;
+    public bool _isDead = false;
 
     //玩家单例
     [SerializeField]
@@ -80,8 +81,10 @@ public class Player : BaseCharacter
     //玩家信息类
     public PlayerInfo _playerInfo { get; private set; }
     //玩家相机
-    public Camera _playerCamera;
+    public Camera playerCamera;
     private PhysicalDetection physicalDetection;
+
+    private bool skipFirstEnable = true;
 
     #region 碰撞检测
     [SerializeField]
@@ -94,7 +97,14 @@ public class Player : BaseCharacter
     private RaycastHit2D[] rayCastHit2Ds;
     #endregion
 
-
+    [Header("广播事件")]
+    [SerializeField]
+    private VoidEventSO gameOverEventSO;
+    [Header("监听事件")]
+    [SerializeField]
+    private VoidEventSO loadGameEventSO;
+    [SerializeField]
+    private VoidEventSO newGameEventSO;
     void Start()
     {   //角色组件的初始化
         physicalDetection = GetComponent<PhysicalDetection>();
@@ -102,9 +112,9 @@ public class Player : BaseCharacter
         anim = GetComponentInChildren<Animator>();
         rigidbody = GetComponent<Rigidbody2D>();
         _playerInfo = GetComponent<PlayerInfo>();
-        _playerCamera = transform.parent.GetComponentInChildren<Camera>();
+        playerCamera = transform.parent.GetComponentInChildren<Camera>();
         playerController = GetComponent<PlayerController>();
-        Assert.IsNotNull(_playerCamera, (this + "玩家相机为空"));
+        Assert.IsNotNull(playerCamera, (this + "玩家相机为空"));
         Assert.IsNotNull(_playerInfo, (this + "玩家信息类为空"));
         //获取角色场景单例
         if (_playerManager == null)
@@ -123,8 +133,13 @@ public class Player : BaseCharacter
         //方向默认为右，1
         direction = 1;
         _playerAnimator = GetComponentInChildren<PlayerAnimator>();
+        (this as ISaveableGameObject).RegisterSaveDate();
+        //添加事件监听
+        newGameEventSO.AddEventListener(ResetPlayer);
+        loadGameEventSO.AddEventListener(ResetPlayer);
 
     }
+
 
 
     void Update()
@@ -150,6 +165,23 @@ public class Player : BaseCharacter
     private void FixedUpdate()
     {
         stateMachine.FixedUpdate();
+    }
+
+    private void OnEnable()
+    {
+        if (skipFirstEnable)
+        {
+            skipFirstEnable = false;
+            return;
+        }
+        (this as ISaveableGameObject).RegisterSaveDate();
+    }
+
+    private void OnDisable()
+    {
+        (this as ISaveableGameObject).UnRegisterSaveDate();
+        newGameEventSO.RemoveEventListener(ResetPlayer);
+        loadGameEventSO.RemoveEventListener(ResetPlayer);
     }
 
     private void CheckCollsion()
@@ -342,8 +374,55 @@ public class Player : BaseCharacter
     {
         isInput = false;
         _isDead = true;
+        gameOverEventSO?.Raise();
         stateMachine.ChangeState<PlayerDeadBehavior>("Dead1");
     }
 
+    public void ResetPlayer()
+    {
+        if (_isDead || _playerInfo.GetInfo(GetInfoType.Health) <= 0)
+        {
 
+            _playerInfo.SetHealth(_playerInfo.GetInfo(GetInfoType.MaxHealth));
+            _isDead = false;
+        }
+
+        stateMachine.ChangeState<PlayerIdleBehavior>("Idle1");
+    }
+
+    public DataDefinition GetDateDefinition()
+    {
+        return GetComponent<DataDefinition>();
+    }
+
+
+    public void SaveDate(ref SavebleGameObjectDate date)
+    {
+        var id = GetDateDefinition().DateId;
+        var pos = transform.position;
+        if (date.SaveDateInfoDict.ContainsKey(id))
+        {
+            date.SaveDateInfoDict[id].SavePosDate(pos.x, pos.y, pos.z);
+            date.SaveDateInfoDict[id].health = _playerInfo.GetInfo(GetInfoType.Health);
+        }
+        else
+        {
+            var saveInfo = new SaveInfo();
+            saveInfo.SavePosDate(pos.x, pos.y, pos.z);
+            saveInfo.health = _playerInfo.GetInfo(GetInfoType.Health);
+            date.SaveDateInfoDict.Add(id, saveInfo);
+        }
+    }
+
+    public void LoadSaveDate(ref SavebleGameObjectDate date)
+    {
+        var id = GetDateDefinition().DateId;
+        if (date.SaveDateInfoDict.ContainsKey(id))
+        {
+            var saveDate = date.SaveDateInfoDict[id];
+            transform.position = saveDate.GetSavePosDate();
+            _playerInfo.SetHealth(saveDate.health);
+            _isDead = false;
+        }
+    }
 }

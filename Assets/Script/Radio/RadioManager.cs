@@ -10,9 +10,14 @@ public class RadioManager : MonoBehaviour
     {
 
     }
+    [Header("¼àÌýÊÂ¼þ")]
+    [SerializeField]
+    private FloatEventSO setMasterVolumeSO;
+
     [SerializeField]
     private AudioMixer audioMixer;
 
+    private float currentMasterVolume;
     public static RadioManager instance;
 
     private Dictionary<string, FXRadio> DicAudioClip = new Dictionary<string, FXRadio>();
@@ -35,13 +40,22 @@ public class RadioManager : MonoBehaviour
                 var audioSource = FXAudioSources[i];
                 audioSource.playOnAwake = false;
                 audioSource.loop = false;
+                audioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("FX/Player")[0];
             }
         }
         else
             Destroy(gameObject);
     }
 
+    private void Start()
+    {
+        setMasterVolumeSO.AddEventListener(SetMasterVolume);
+    }
 
+    private void OnDisable()
+    {
+        setMasterVolumeSO.RemoveEventListener(SetMasterVolume);
+    }
     private void Update()
     {
         foreach (var FXAudioSource in FXAudioSources)
@@ -130,5 +144,16 @@ public class RadioManager : MonoBehaviour
         }
 
 
+    }
+
+    public void SetMasterVolume(float value)
+    {
+        audioMixer.SetFloat("MasterVolume", value);
+    }
+
+    public float GetMasterVolume()
+    {
+        audioMixer.GetFloat("MasterVolume", out currentMasterVolume);
+        return currentMasterVolume;
     }
 }

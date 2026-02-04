@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using static BuffEffectTable;
 using static BuffRealize;
+using UnityEngine.InputSystem;
 
 public class BuffManager : MonoBehaviour
 {
@@ -17,8 +18,8 @@ public class BuffManager : MonoBehaviour
     [SerializeField]
     public BuffEffectTable BuffEffectTable = null;
 
-    [SerializeField]
-    private SkeletonEnemy test;
+    //[SerializeField]
+    //private SkeletonEnemy test;
 
     private void Awake()
     {
@@ -45,13 +46,13 @@ public class BuffManager : MonoBehaviour
 
     private void Update()
     {
-        //if (Input.GetKeyDown("o"))
+        //if (Keyboard.current.nKey.wasPressedThisFrame)
         //{
         //    RuningBuff(PlayerManager.instance.player.GetComponent<IBuff>(), 3, .5f, BuffType.Slow, BuffEffectType.Freeze);
         //}
-        //else if (Input.GetKeyDown("p"))
+        //else if (Keyboard.current.mKey.wasPressedThisFrame)
         //{
-        //    RuningBuff(test.GetComponent<IBuff>(), 3, 10, BuffType.DamageOverTime, BuffEffectType.Burn, DamageType.Elementaldamage, DamageElementType.Fire);
+        //    RuningBuff(PlayerManager.instance.player.GetComponent<IBuff>(), 3, 10, BuffType.DamageOverTime, BuffEffectType.Burn, DamageType.Elementaldamage, DamageElementType.Fire);
         //}
     }
 

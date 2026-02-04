@@ -3764,10 +3764,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   goToScene:
-    m_AssetGUID: d04a4080edb5a9b45aa09aaa61284fb9
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
+    key: Cave
+    sceneAssetReference:
+      m_AssetGUID: d04a4080edb5a9b45aa09aaa61284fb9
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
   transferTarget: {fileID: 0}
   transferPosition: {x: -27.66, y: -0.16, z: 0}
 --- !u!61 &1696777833
@@ -3785,7 +3787,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 768
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2

@@ -11,7 +11,7 @@ using UnityEngine.Windows;
 
 //}
 
-public class BaseEnemy : MonoBehaviour, IRole
+public class BaseEnemy : MonoBehaviour, IRole, ISaveableGameObject
 {
 
 
@@ -224,9 +224,6 @@ public class BaseEnemy : MonoBehaviour, IRole
         _isChangeState = Is;
     }
 
-
-
-
     public virtual void BeBackAttack()
     {
         _isBeBackAttack = true;
@@ -291,5 +288,54 @@ public class BaseEnemy : MonoBehaviour, IRole
     public GameObject GetGameObject()
     {
         return this.gameObject;
+    }
+
+    public DataDefinition GetDateDefinition()
+    {
+        return GetComponent<DataDefinition>();
+    }
+
+    public void SaveDate(ref SavebleGameObjectDate date)
+    {
+        var id = GetDateDefinition().DateId;
+        var pos = transform.position;
+        if (date.SaveDateInfoDict.ContainsKey(id))
+        {
+            date.SaveDateInfoDict[id].SavePosDate(pos.x, pos.y, pos.z);
+            date.SaveDateInfoDict[id].health = _enemyInfo.GetInfo(GetInfoType.Health);
+        }
+        else
+        {
+            SaveInfo saveInfo = new SaveInfo();
+            saveInfo.SavePosDate(pos.x, pos.y, pos.z);
+            saveInfo.health = _enemyInfo.GetInfo(GetInfoType.Health);
+            date.SaveDateInfoDict.Add(id, saveInfo);
+        }
+    }
+
+    public void LoadSaveDate(ref SavebleGameObjectDate date)
+    {
+        var id = GetDateDefinition().DateId;
+        if (date.SaveDateInfoDict.ContainsKey(id))
+        {
+            var saveDate = date.SaveDateInfoDict[id];
+            transform.position = saveDate.GetSavePosDate();
+            _enemyInfo.SetHealth(saveDate.health);
+        }
+    }
+
+    private void OnEnable()
+    {
+        (this as ISaveableGameObject).RegisterSaveDate();
+    }
+
+    private void OnDisable()
+    {
+        (this as ISaveableGameObject).UnRegisterSaveDate();
+    }
+
+    private void OnDestroy()
+    {
+        (this as ISaveableGameObject).UnRegisterSaveDate();
     }
 }

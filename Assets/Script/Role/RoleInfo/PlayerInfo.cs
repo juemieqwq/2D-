@@ -125,6 +125,11 @@ public class PlayerInfo : MonoBehaviour, IPlayerInfo, IBuff
         forceJump = originalForceJump;
 
     }
+
+    public void SetHealth(float NewHealth)
+    {
+        health = NewHealth;
+    }
     #endregion
 
 

@@ -52,7 +52,6 @@ public class PlayerController : MonoBehaviour
 
     private void OnEnable()
     {
-
         inputActions.Enable();
     }
     private void OnDisable()
@@ -74,4 +73,13 @@ public class PlayerController : MonoBehaviour
         else if (typeof(T) == typeof(Vector3))
             inputAction.valueVector3 = input.ReadValue<Vector3>();
     }
+
+    public void SetPlayerController(bool isAcceptInput)
+    {
+        if (isAcceptInput)
+            inputActions.PlayingGame.Enable();
+        else
+            inputActions.PlayingGame.Disable();
+    }
+
 }

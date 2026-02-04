@@ -4,9 +4,10 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 public class Portal : MonoBehaviour, IInteraction
 {
-    [SerializeField]
+
     [Header("传送所去往的场景")]
-    private AssetReference goToScene;
+    [SerializeField]
+    private SceneAsset goToScene;
     [SerializeField]
     private Transform transferTarget;
     [SerializeField]
@@ -45,7 +46,7 @@ public class Portal : MonoBehaviour, IInteraction
 
     private void TransferToNewScene()
     {
-        SceneLoadManager.instance.LoadNewScene(goToScene, TransferPosition());
+        SceneLoadManager.instance.LoadNewScene(goToScene.key, TransferPosition());
     }
 
     private Vector3 TransferPosition()

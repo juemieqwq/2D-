@@ -28,5 +28,9 @@ public class PlayerDeadBehavior : RoleBaseState
     public override void Update()
     {
         base.Update();
+        if (player._playerInfo.GetInfo(GetInfoType.Health) != 0)
+        {
+            hostStateMachine.ChangeState<PlayerIdleBehavior>("Idle1");
+        }
     }
 }

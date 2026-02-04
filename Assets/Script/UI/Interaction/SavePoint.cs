@@ -1,21 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
-public class TestInteration : MonoBehaviour, IInteraction
+public class SavePoint : MonoBehaviour, IInteraction
 {
     private BoxCollider2D boxCollider2D;
-    private SpriteRenderer sprite;
+    [SerializeField]
+    private GameObject light;
+
+    [Header("¹ã²¥")]
+    [SerializeField]
+    private VoidEventSO saveDataEventSO;
 
     private void Start()
     {
         boxCollider2D = GetComponent<BoxCollider2D>();
-        sprite = GetComponent<SpriteRenderer>();
     }
 
     public void ButtonPress()
     {
         boxCollider2D.enabled = false;
-        sprite.sprite = null;
+        light.SetActive(true);
+        saveDataEventSO.Raise();
     }
 }

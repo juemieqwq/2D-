@@ -31,3 +31,9 @@ MonoBehaviour:
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 1
+  - key: Menu
+    sceneAssetReference:
+      m_AssetGUID: 978f1052c3a0d5e4ba30b9f32d9c1e29
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0

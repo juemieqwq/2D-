@@ -8,6 +8,8 @@ public class PlayerIdleBehavior : PlayerBaseState
     {
         base.Enter();
         base.PlayerInit();
+        player.SetIsInput(true);
+        player._isDead = false;
         hostRigidbody2D.velocity = Vector3.zero;
     }
 

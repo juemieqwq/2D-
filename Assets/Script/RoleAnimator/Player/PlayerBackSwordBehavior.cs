@@ -68,7 +68,7 @@ public class PlayerBackSwordBehavior : PlayerBaseState
     private void PlayerDiretionFollowMouse()
     {
 
-        Vector2 mousePosition = (Vector2)player._playerCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        Vector2 mousePosition = (Vector2)player.playerCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         if (mousePosition.x - player.transform.position.x > 0 && player.direction == -1)
         {
             player.Filp();

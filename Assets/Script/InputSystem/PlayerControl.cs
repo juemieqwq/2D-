@@ -208,6 +208,24 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": ""Tap(duration=0.3),SlowTap(duration=0.3,pressPoint=0.3)"",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""tab"",
+                    ""type"": ""Button"",
+                    ""id"": ""6731364d-8fa4-4e7c-ae1a-c5a4c3dc3e01"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DownPlatform"",
+                    ""type"": ""Button"",
+                    ""id"": ""81905245-e71c-4264-86a2-c30df3be458b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -452,6 +470,28 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
                     ""action"": ""Interaction"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""57759605-126c-4b96-a4d9-35524f8d795b"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""tab"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c7f039c8-e2e3-41e7-a229-c17545c5c06b"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DownPlatform"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -472,7 +512,7 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
                     ""name"": ""Submit"",
                     ""type"": ""Button"",
                     ""id"": ""7607c7b6-cd76-4816-beef-bd0341cfe950"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -481,7 +521,7 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
                     ""name"": ""Cancel"",
                     ""type"": ""Button"",
                     ""id"": ""15cef263-9014-4fd5-94d9-4e4a6234a6ef"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -545,6 +585,15 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
                     ""type"": ""PassThrough"",
                     ""id"": ""9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be"",
                     ""expectedControlType"": ""Quaternion"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ESC"",
+                    ""type"": ""Button"",
+                    ""id"": ""39e29f82-9549-48ca-91d8-512c76974243"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -968,6 +1017,17 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
                     ""action"": ""TrackedDeviceOrientation"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""672e1b39-f9a5-4dca-bc6a-8c96d61ff4f3"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ESC"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -1050,6 +1110,8 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
         m_PlayingGame_ChangeThrowSwordType = m_PlayingGame.FindAction("ChangeThrowSwordType", throwIfNotFound: true);
         m_PlayingGame_Transfer = m_PlayingGame.FindAction("Transfer", throwIfNotFound: true);
         m_PlayingGame_Interaction = m_PlayingGame.FindAction("Interaction", throwIfNotFound: true);
+        m_PlayingGame_tab = m_PlayingGame.FindAction("tab", throwIfNotFound: true);
+        m_PlayingGame_DownPlatform = m_PlayingGame.FindAction("DownPlatform", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1062,6 +1124,7 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
         m_UI_ScrollWheel = m_UI.FindAction("ScrollWheel", throwIfNotFound: true);
         m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
+        m_UI_ESC = m_UI.FindAction("ESC", throwIfNotFound: true);
     }
 
     ~@PlayerControl()
@@ -1156,6 +1219,8 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayingGame_ChangeThrowSwordType;
     private readonly InputAction m_PlayingGame_Transfer;
     private readonly InputAction m_PlayingGame_Interaction;
+    private readonly InputAction m_PlayingGame_tab;
+    private readonly InputAction m_PlayingGame_DownPlatform;
     /// <summary>
     /// Provides access to input actions defined in input action map "PlayingGame".
     /// </summary>
@@ -1219,6 +1284,14 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "PlayingGame/Interaction".
         /// </summary>
         public InputAction @Interaction => m_Wrapper.m_PlayingGame_Interaction;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayingGame/tab".
+        /// </summary>
+        public InputAction @tab => m_Wrapper.m_PlayingGame_tab;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayingGame/DownPlatform".
+        /// </summary>
+        public InputAction @DownPlatform => m_Wrapper.m_PlayingGame_DownPlatform;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1284,6 +1357,12 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
             @Interaction.started += instance.OnInteraction;
             @Interaction.performed += instance.OnInteraction;
             @Interaction.canceled += instance.OnInteraction;
+            @tab.started += instance.OnTab;
+            @tab.performed += instance.OnTab;
+            @tab.canceled += instance.OnTab;
+            @DownPlatform.started += instance.OnDownPlatform;
+            @DownPlatform.performed += instance.OnDownPlatform;
+            @DownPlatform.canceled += instance.OnDownPlatform;
         }
 
         /// <summary>
@@ -1334,6 +1413,12 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
             @Interaction.started -= instance.OnInteraction;
             @Interaction.performed -= instance.OnInteraction;
             @Interaction.canceled -= instance.OnInteraction;
+            @tab.started -= instance.OnTab;
+            @tab.performed -= instance.OnTab;
+            @tab.canceled -= instance.OnTab;
+            @DownPlatform.started -= instance.OnDownPlatform;
+            @DownPlatform.performed -= instance.OnDownPlatform;
+            @DownPlatform.canceled -= instance.OnDownPlatform;
         }
 
         /// <summary>
@@ -1381,6 +1466,7 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_ScrollWheel;
     private readonly InputAction m_UI_TrackedDevicePosition;
     private readonly InputAction m_UI_TrackedDeviceOrientation;
+    private readonly InputAction m_UI_ESC;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -1432,6 +1518,10 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/TrackedDeviceOrientation".
         /// </summary>
         public InputAction @TrackedDeviceOrientation => m_Wrapper.m_UI_TrackedDeviceOrientation;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/ESC".
+        /// </summary>
+        public InputAction @ESC => m_Wrapper.m_UI_ESC;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1488,6 +1578,9 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
             @TrackedDeviceOrientation.started += instance.OnTrackedDeviceOrientation;
             @TrackedDeviceOrientation.performed += instance.OnTrackedDeviceOrientation;
             @TrackedDeviceOrientation.canceled += instance.OnTrackedDeviceOrientation;
+            @ESC.started += instance.OnESC;
+            @ESC.performed += instance.OnESC;
+            @ESC.canceled += instance.OnESC;
         }
 
         /// <summary>
@@ -1529,6 +1622,9 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
             @TrackedDeviceOrientation.started -= instance.OnTrackedDeviceOrientation;
             @TrackedDeviceOrientation.performed -= instance.OnTrackedDeviceOrientation;
             @TrackedDeviceOrientation.canceled -= instance.OnTrackedDeviceOrientation;
+            @ESC.started -= instance.OnESC;
+            @ESC.performed -= instance.OnESC;
+            @ESC.canceled -= instance.OnESC;
         }
 
         /// <summary>
@@ -1725,6 +1821,20 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnInteraction(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "tab" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTab(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "DownPlatform" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDownPlatform(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
@@ -1803,5 +1913,12 @@ public partial class @PlayerControl: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnTrackedDeviceOrientation(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ESC" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnESC(InputAction.CallbackContext context);
     }
 }

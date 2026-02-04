@@ -15,3 +15,5 @@ MonoBehaviour:
   panelsList:
   - panelPrefab: {fileID: 8830359163470178541, guid: 5df207c5b093c534eb454a34d7f397d7, type: 3}
     panelName: PackagePanel
+  - panelPrefab: {fileID: 3039660248485241969, guid: ca6c04ea7639e534fba662e8e370702e, type: 3}
+    panelName: SettingPanel

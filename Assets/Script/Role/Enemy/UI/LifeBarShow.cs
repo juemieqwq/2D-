@@ -15,19 +15,19 @@ public class LifeBarShow : MonoBehaviour
     private Coroutine TransitionCoroutine;
     [SerializeField]
     private TextMeshProUGUI text;
-
     private EnemyInfo enemyInfo;
     private PlayerInfo playerInfo;
-
     private float MaxHealth;
     private float TransitionHealth;
     private float CurrentHealth;
-
-
+    private Transform[] showLifeBarGameObjects = { };
+    private bool isShow;
 
 
     void Start()
     {
+        showLifeBarGameObjects = GetComponentsInChildren<Transform>();
+        isShow = true;
         Assert.IsNotNull(health, "healthÎª¿Õ");
         Assert.IsNotNull(transition, "transitionÎª¿Õ");
         Assert.IsNotNull(text, "testÎª¿Õ");
@@ -39,8 +39,31 @@ public class LifeBarShow : MonoBehaviour
     private void Update()
     {
         SetLifeBarShow();
-        if (TransitionHealth <= 0)
-            gameObject.SetActive(false);
+
+        //if (CurrentHealth <= 0 && TransitionHealth <= 0)
+        //    gameObject.SetActive(false);
+
+        if (CurrentHealth <= 0 && TransitionHealth <= 0 && isShow)
+        {
+            foreach (var showGameObject in showLifeBarGameObjects)
+            {
+                if (showGameObject.gameObject == gameObject)
+                    continue;
+                showGameObject.gameObject.SetActive(false);
+
+            }
+            isShow = false;
+        }
+        else if (CurrentHealth > 0 && !isShow)
+        {
+            foreach (var showGameObject in showLifeBarGameObjects)
+            {
+                if (showGameObject.gameObject == gameObject)
+                    continue;
+                showGameObject.gameObject.SetActive(true);
+            }
+            isShow = true;
+        }
 
     }
 

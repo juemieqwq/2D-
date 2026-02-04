@@ -154,5 +154,6 @@ public class EnemyInfo : MonoBehaviour, IEnemyInfo, IBuff
     #endregion
 
     #region 该类的方法
+    public void SetHealth(float NewHealth) => health = NewHealth;
     #endregion
 }

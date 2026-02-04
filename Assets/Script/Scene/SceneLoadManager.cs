@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 
-public class SceneLoadManager : MonoBehaviour
+public class SceneLoadManager : MonoBehaviour, ISaveableGameObject
 {
     private SceneLoadManager()
     {
@@ -14,13 +14,25 @@ public class SceneLoadManager : MonoBehaviour
 
     public static SceneLoadManager instance;
 
-
+    [Header("监听事件")]
+    [SerializeField]
+    private VoidEventSO newGameEvent;
+    [Header("广播事件")]
+    [SerializeField]
+    private VoidEventSO unLoadSceneEvent;
+    [Header("菜单角色位置")]
+    [SerializeField]
+    public Vector3 menuPosition;
+    [Header("第一个场景角色位置")]
+    [SerializeField]
+    private Vector3 firstPosition;
     [SerializeField]
     [Header("场景资源的SO")]
     private SceneAssetsReferenceSO sceneReferenceSO;
-    private AssetReference currentScene;
+    public AssetReference currentScene { private set; get; }
+    public string currentSceneKey { private set; get; }
     private AssetReference goToScene;
-
+    private string goToSceneKey;
     private Vector3 playerGoToPosition;
     private bool isFade;
     [Header("淡出淡入的UI对象")]
@@ -52,19 +64,40 @@ public class SceneLoadManager : MonoBehaviour
                 Debug.LogError("场景引用赋值失败");
 
         }
-        currentScene = sceneReferenceSO.GetSceneAssetReference("Cave");
+        currentScene = sceneReferenceSO.GetSceneAssetReference("Menu");
+        currentSceneKey = "Menu";
         currentScene.LoadSceneAsync(LoadSceneMode.Additive, true);
+        newGameEvent.AddEventListener(LoadNewGame);
     }
+
+
 
     private void Start()
     {
         player = PlayerManager.instance.player;
+        player.playerCamera.gameObject.SetActive(false);
+        player.playerController.SetPlayerController(false);
+        player.transform.position = menuPosition;
+        (this as ISaveableGameObject).RegisterSaveDate();
+    }
+
+    private void OnDisable()
+    {
+        (this as ISaveableGameObject).UnRegisterSaveDate();
     }
 
 
-    public void LoadNewScene(AssetReference newScene, Vector3 playerGoToPosition, bool isFade = true)
+
+    public void LoadNewGame()
     {
-        goToScene = newScene;
+        LoadNewScene("Cave", firstPosition);
+    }
+
+
+    public void LoadNewScene(string GoToKey, Vector3 playerGoToPosition, bool isFade = true)
+    {
+        goToSceneKey = GoToKey;
+        goToScene = sceneReferenceSO.GetSceneAssetReference(goToSceneKey);
         this.playerGoToPosition = playerGoToPosition;
         this.isFade = isFade;
         if (loadSceneCoroutine == null && goToScene != null)
@@ -77,20 +110,22 @@ public class SceneLoadManager : MonoBehaviour
         if (isFade)
         {
 
-            player.SetIsInput(false);
+            player.playerController.SetPlayerController(false);
             player.SetInputX(0);
             fadeClass.IsFadeIn(fadeTime, true);
             yield return waitFadeTime;
         }
 
-        //等待新场景加载
-        yield return goToScene.LoadSceneAsync(LoadSceneMode.Additive, true);
-
+        unLoadSceneEvent?.Raise();
         //等待上一个场景卸载
         yield return currentScene.UnLoadScene();
+        //等待新场景加载
+        yield return goToScene.LoadSceneAsync(LoadSceneMode.Additive, true);
         //将已卸载的空场景引用改为跳转的场景
         currentScene = goToScene;
+        currentSceneKey = goToSceneKey;
         goToScene = null;
+        goToSceneKey = string.Empty;
         PlayerManager.instance.player.transform.position = playerGoToPosition;
         loadSceneCoroutine = null;
         waitFadeTime = new WaitForSeconds(fadeTime * .5f);
@@ -99,8 +134,28 @@ public class SceneLoadManager : MonoBehaviour
         {
             fadeClass.IsFadeIn(fadeTime, false);
             yield return waitFadeTime;
-            player.SetIsInput(true);
+            if (goToSceneKey == "Menu")
+                player.playerController.SetPlayerController(false);
+            else
+                player.playerController.SetPlayerController(true);
         }
 
+    }
+
+    public DataDefinition GetDateDefinition()
+    {
+        return null;
+    }
+
+    public void SaveDate(ref SavebleGameObjectDate date)
+    {
+        date.SaveSceneDate(currentSceneKey);
+    }
+
+    public void LoadSaveDate(ref SavebleGameObjectDate date)
+    {
+        var key = date.LoadSceneDate();
+        if (key != currentSceneKey)
+            LoadNewScene(key, player.transform.position);
     }
 }
